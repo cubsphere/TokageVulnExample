@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html dir="ltr" hascustombackground="false" bookmarkbarattached="false" lang="en" class="md">
+    <head>
+        <title>Simple HTML Form</title>
+        <style>
+            html {
+                height: 100%;
+            }
+            body {
+                background-color: lightgray;
+                display: grid;
+                grid-template-columns: 1fr 1.5fr 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 100%;
+            }
+            form {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                grid-column: 2;
+                grid-row: 2;
+            }
+            input {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: whitesmoke;
+            }
+            button {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: lightblue;
+            }
+            p {
+                text-align: center;
+                margin: 2px;
+                text-align: center;
+            }
+            p.err {
+                color: red;    
+			}
+        </style>
+        <script>
+            window.addEventListener("load", function() {
+                let form = document.getElementById("form")
+                let butt = document.getElementById("button")
+                let err = document.getElementById("errmsg")
+                let tokenfield = document.getElementById("token")
+                let newpassfield = document.getElementById("newpass")
+                let params = new URLSearchParams(window.location.search)
+                let email = params.get("email")
+                document.getElementById("email").innerText = `${email.replace(/%40/, "@")}`
+
+                form.addEventListener("submit", function(event) {
+                    event.preventDefault()
+                    butt.disabled = true
+
+                    let xhr = new XMLHttpRequest()
+                    xhr.onload = function(event) {
+                        if (xhr.status == 401) {
+                            err.innerText = "Token or e-mail incorrect. Please try again."
+						} else if (xhr.status == 200) {
+                            form.innerHTML = "<p>Your password was changed successfully.</p><p>You may now proceed to the <a href='/login'>login</a> page and sign in with your new password."
+                        }
+                        butt.disabled = false
+                    }
+                    xhr.onerror = function(event) {
+                        err.innerText = "Error reaching the server."
+                        butt.disabled = false
+                    }
+                    xhr.open("POST", "/api/reset")
+
+                    xhr.send("email=" + email + "&token=" + encodeURIComponent(tokenfield.value) + "&newpass=" + encodeURIComponent(newpass.value))
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <form id="form">
+            <p>An email containing an access token has been sent to <b id="email">&nbsp;</b>.</p>
+            <p>To change your password, type your access token and your new password below and press submit.</p>
+            <p class="err" id="errmsg">&nbsp;</p>
+            <input id="token" placeholder="Token" required="">
+            <input type="password" id="newpass" placeholder="New password" required="">
+            <p>&nbsp;</p>
+            <button id="button">Submit</button>
+        </form>
+    </body>
+</html>

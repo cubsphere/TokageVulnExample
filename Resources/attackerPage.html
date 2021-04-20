@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html dir="ltr" hascustombackground="false" bookmarkbarattached="false" lang="en" class="md">
+    <head>
+        <title>Simple HTML Form</title>
+        <style>
+            html {
+                height: 100%;
+            }
+            body {
+                background-color: lightgray;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 100%;
+            }
+            div {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                grid-column: 2;
+                grid-row: 2;
+            }
+            input {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: lightblue;
+            }
+            p {
+                text-align: center;
+                margin: 2px;
+			}
+        </style>
+    </head>
+    <body>
+        <div>
+            <p>Welcome to your homepage, <b>evil</b>.</p>
+            <p>&nbsp;</p>
+            <p>There doesn't seem to be anything here...</p>
+            <p>&nbsp;</p>
+            <input type="button" onclick="location.href='/logout'" value="Logout" />
+        </div>
+    </body>
+</html>

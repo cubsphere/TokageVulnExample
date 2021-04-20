@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html dir="ltr" hascustombackground="false" bookmarkbarattached="false" lang="en" class="md">
+    <head>
+        <title>Simple HTML Form</title>
+        <style>
+            html {
+                height: 100%;
+            }
+            body {
+                background-color: lightgray;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 100%;
+            }
+            form {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                grid-column: 2;
+                grid-row: 2;
+            }
+            input {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: whitesmoke;
+            }
+            button {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: lightblue;
+            }
+            a {
+                color: midnightblue;
+            }
+            p {
+                text-align: center;
+                margin: 2px;
+			}
+            p.err {
+                color: red;    
+			}
+        </style>
+        <script>
+            window.addEventListener("load", function() {                
+                var form = document.getElementById("form")
+                var butt = document.getElementById("button")
+                var err = document.getElementById("errmsg")
+                form.addEventListener("submit", function(event) {
+                    event.preventDefault()
+                    butt.disabled = true
+                    
+                    var xhr = new XMLHttpRequest()
+                    xhr.onload = function(event) {
+                        if (xhr.status == 401) {
+                            err.innerHTML = "User information is incorrect. Please try again."
+						} else if (xhr.status == 200) {
+                            window.location = "/me"    
+                        }
+                        butt.disabled = false
+                    }
+                    xhr.onerror = function(event) {
+                        err.innerHTML = "Error reaching the server."
+                        butt.disabled = false
+                    }
+                    xhr.open("POST", form.target)
+
+                    var fd = new FormData(form)
+                    var str = ""
+                    for (pair of fd.entries()) {
+                        str += encodeURIComponent(pair[0]) + "=" + encodeURIComponent(pair[1]) + "&"
+					}
+                    str = str.substring(0, str.length - 1);
+                    xhr.send(str)
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <form id="form" target="/api/login">
+            <input type="text" name="user" placeholder="Username or email" required="">
+            <input type="password" name="password" placeholder="Password" required="">
+            <p class="err" id="errmsg">&nbsp;</p>
+            <button id="button">Log in</button>
+            <a href="/forgot">Forgot your password?</a>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html dir="ltr" hascustombackground="false" bookmarkbarattached="false" lang="en" class="md">
+    <head>
+        <title>Simple HTML Form</title>
+        <style>
+            html {
+                height: 100%;
+            }
+            body {
+                background-color: lightgray;
+                display: grid;
+                grid-template-columns: 1fr 1.5fr 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                min-height: 100%;
+            }
+            form {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                grid-column: 2;
+                grid-row: 2;
+            }
+            div.wrapper {
+                grid-column: 3;
+                grid-row-start: 2;
+                grid-row-end: 4;
+                border: 2px solid darkgray;
+                background-color: silver;
+            }
+            input#email {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: whitesmoke;
+            }
+            button {
+                height: 3vh;
+                width: 30vw;
+                margin: 2px;
+                background-color: lightblue;
+            }
+            p {
+                text-align: center;
+                margin: 2px;
+                text-align: center;
+            }
+            p.err {
+                color: red;    
+			}
+            table {
+                width: 100%;
+            }
+            td, th {
+                text-align: center;
+            }
+            td {
+                border: 1px solid black;
+            }
+        </style>
+        <script>
+            window.addEventListener("load", function() {
+                document.getElementById("enable").checked = false
+                let form = document.getElementById("form")
+                let butt = document.getElementById("button")
+                let err = document.getElementById("errmsg")
+                let mailfield = document.getElementsByName("email")[0]
+                let preventRedirection = document.getElementById("prevent")
+                let table = document.getElementById("table")
+                var callback = _ => undefined
+                form.addEventListener("submit", function(event) {
+                    event.preventDefault()
+                    butt.disabled = true
+                    var reqtime
+
+                    let xhr = new XMLHttpRequest()
+                    xhr.onload = function(event) {
+                        let restime = Math.round(performance.now())
+                        if (!preventRedirection.checked)
+                            window.location = `/reset?email=${encodeURIComponent(mailfield.value)}`
+            
+                        let row = table.insertRow()
+                        let res = xhr.responseText
+                        row.insertCell().innerText = res !== "" ? res : "?"
+                        row.insertCell().innerText = reqtime
+                        row.insertCell().innerText = restime
+                        butt.disabled = false
+                        callback()
+                    }
+                    xhr.onerror = function(event) {
+                        err.innerText = "Error reaching the server."
+                        butt.disabled = false
+                    }
+                    xhr.open("POST", form.target)
+
+                    let email = encodeURIComponent(mailfield.value)
+                    reqtime = Math.round(performance.now())
+                    xhr.send("email=" + email)
+                })
+
+                let get55 = document.getElementById("get55")
+                get55.addEventListener("click", function (event) {
+                    let i = 0
+                    callback = _ => {
+                        if (i >= 55) {
+                            callback = _ => undefined
+                            return
+                        }
+                        ++i
+                        butt.click()
+                    }
+                    callback()
+                })
+            })
+
+            function tools() {
+                let enabled = document.getElementById("enable").checked
+                if (enabled) {
+                    document.getElementById("toolbox").style.display = ""
+                    document.getElementById("prevent").checked = true
+                } else {
+                    document.getElementById("toolbox").style.display = "none"
+                    document.getElementById("prevent").checked = false
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <form id="form" target="/api/request-reset-token">
+            <p >Fill in the following field with your email address and press submit.</p>
+            <p>You will receive an access token in your inbox.</p>
+            <p class="err" id="errmsg">&nbsp;</p>
+            <input type="email" name="email" placeholder="Email" required="">
+            <p>&nbsp;</p>
+            <button id="button">Submit</button>
+        </form>
+        <div class="wrapper">
+            <input type="checkbox" style="margin-bottom:5px" id="enable" onclick="tools()"/><label>Enable attacker tools</label>
+            <div id="toolbox" style="flex-direction:column; display:none">
+                <input type="checkbox" style="margin-bottom:5px" id="prevent" /><label>Disable redirection</label>
+                <button id="get55">Get 55</button>
+                <div style="overflow-y:auto">
+                    <table id="table">
+                        <caption>Attacker inbox:</caption>
+                        <tr>
+                            <th>token</th>
+                            <th>reqtime</th>
+                            <th>restime</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

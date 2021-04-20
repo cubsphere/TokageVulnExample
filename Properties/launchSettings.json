@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TokageVulnExample": {
+      "commandName": "Project",
+      "commandLineArgs": "-m 100 -d 50"
+    }
+  }
+}
